@@ -1,9 +1,10 @@
-import { BadRequestException, Injectable,  NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Book } from './schemas/book.schema';
 import mongoose, { Model } from 'mongoose';
 import { Query } from 'express-serve-static-core'
 import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
+import { Cron, CronExpression } from '@nestjs/schedule';
 
 @Injectable()
 export class BookService {
@@ -11,6 +12,12 @@ export class BookService {
     private bookModel: Model<Book>,
         private eventEmitter: EventEmitter2
     ) { }
+
+
+    @Cron(CronExpression.EVERY_MINUTE)
+    handleCron() {
+        console.log("Every sec execute");
+    }
 
     async findAll(query: Query): Promise<Book[]> {
 
