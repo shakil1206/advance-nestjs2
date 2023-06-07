@@ -8,7 +8,9 @@ import { Query as ExpressQuery } from 'express-serve-static-core'
 
 @Controller('book')
 export class BookController {
-    constructor(private readonly BookService: BookService) { }
+    constructor(
+        private readonly BookService: BookService
+    ) { }
 
     @Get()
     async getAllBook(@Query() query: ExpressQuery): Promise<Book[]> {

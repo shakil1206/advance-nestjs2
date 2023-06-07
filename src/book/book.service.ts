@@ -1,13 +1,15 @@
-import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable,  NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Book } from './schemas/book.schema';
 import mongoose, { Model } from 'mongoose';
 import { Query } from 'express-serve-static-core'
+import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 
 @Injectable()
 export class BookService {
     constructor(@InjectModel(Book.name)
-    private bookModel: Model<Book>
+    private bookModel: Model<Book>,
+        private eventEmitter: EventEmitter2
     ) { }
 
     async findAll(query: Query): Promise<Book[]> {
@@ -29,8 +31,19 @@ export class BookService {
     }
 
     async create(book: Book): Promise<Book> {
-        return await this.bookModel.create(book);
+        const bookData = await this.bookModel.create(book);
+
+        this.eventEmitter.emit('book.created', { bookData });
+        return bookData;
     }
+
+    @OnEvent('book.created')
+    handleOrderCreatedEvent(book: Book) {
+        // handle and process "OrderCreatedEvent" event
+        console.log(book)
+    }
+
+
 
     async findbyId(id: string): Promise<Book> {
 
